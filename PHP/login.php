@@ -13,7 +13,9 @@ include 'db.php';
 $stmt = $conn->prepare("SELECT password FROM admins WHERE username=?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
+$stmt->store_result();
 $stmt->bind_result($hash);
+$stmt->fetch();
 if ($stmt->fetch() && password_verify($password, $hash)) {
     $_SESSION['admin'] = $username;
     echo json_encode(['success' => true]);
