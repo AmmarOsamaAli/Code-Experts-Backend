@@ -14,12 +14,18 @@ $stmt = $conn->prepare("SELECT password FROM admins WHERE username=?");
 $stmt->bind_param("s", $username);
 $stmt->execute();
 $stmt->store_result();
-$stmt->bind_result($hash);
-$stmt->fetch();
-if ($stmt->fetch() && password_verify($password, $hash)) {
-    $_SESSION['admin'] = $username;
-    echo json_encode(['success' => true]);
+
+if ($stmt->num_rows > 0) {
+    $stmt->bind_result($hash);
+    $stmt->fetch();
+
+    if (password_verify($password, $hash)) {
+        $_SESSION['admin'] = $username;
+        echo json_encode(['success' => true]);
+    } else {
+        echo json_encode(['success' => false, 'error' => 'Invalid credentials']);
+    }
 } else {
-    echo json_encode(['success' => false, 'error' => 'Invalid credentials']);
+    echo json_encode(['success' => false, 'error' => 'User not found']);
 }
-?>
+
